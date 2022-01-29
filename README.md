@@ -1,5 +1,5 @@
 # curlThread
-### LibCurl Threading Class Qt5
+### LibCurl Threading Class Qt5 C++
 
 ![Pic](https://curl.se/logo/curl-logo.svg)
 
