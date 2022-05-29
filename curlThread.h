@@ -90,6 +90,9 @@ public:
     bool IsCancel();
     QString getError() const;
     QString getResult() const;
+    bool PureHttpRequest(const QString &Url, const QString &RequestType, int MaxRetry);
+    static bool QuickHttpRequest(const QString &Url,const QString &RequestType,QString &responce,int MaxRetry);
+
 signals:
     void Update(const int &value);
 #ifdef CUSTOM_METHOD

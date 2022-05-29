@@ -292,11 +292,6 @@ bool curlThread::UploadRequest(const QString &RequestType)
         //verify=False. SSL checking disabled
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-        //        struct curl_slist *headers = NULL;
-        //        headers = curl_slist_append(headers, ": ");
-        //        headers = curl_slist_append(headers, "Authorization: Hello world flask**");
-        //        headers = curl_slist_append(headers, "Password: 1234");
-        //        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_mime *mime;
         curl_mimepart *part;
         mime = curl_mime_init(curl);
@@ -451,30 +446,6 @@ bool curlThread::Uploader(const QString &file)
         curl_mime_free(mime);
     }
     curl_easy_cleanup(curl);
-    //    CURL *curl;
-    //    CURLcode res;
-    //    curl = curl_easy_init();
-    //    if(curl) {
-    //      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
-    //      curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:5000/");
-    //      curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-    //      curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, "https");
-    //      struct curl_slist *headers = NULL;
-    //      headers = curl_slist_append(headers, "Email: 3423452");
-    //      headers = curl_slist_append(headers, "Password: dhfadsfasfda");
-    //      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    //      curl_mime *mime;
-    //      curl_mimepart *part;
-    //      mime = curl_mime_init(curl);
-    //      part = curl_mime_addpart(mime);
-    //      curl_mime_name(part, "file");
-    //      curl_mime_filedata(part, "t.txt");
-    //      curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
-    //      res = curl_easy_perform(curl);
-    //      curl_mime_free(mime);
-    //    }
-    //    curl_easy_cleanup(curl);
-
     qInfo() <<QString::fromStdString(readBuffer);;
     if(res==CURLE_OK)
         result=QString::fromStdString(readBuffer);
@@ -499,4 +470,33 @@ QString curlThread::timeConversion(int msecs)
                          QString( "%1" ).arg(milliseconds, 3, 10, QLatin1Char('0')));
 
     return formattedTime;
+}
+
+bool curlThread::PureHttpRequest(const QString &Url, const QString &RequestType,int MaxRetry)
+{
+    if(RequestType.isEmpty()){
+        qDebug() <<"Error Type Empty!";
+        return 0;
+    }
+    QThread::msleep(50);
+    bool ret=DoHttpRequest(Url,RequestType);
+    if(!ret){
+        for(int i=0;i<MaxRetry;i++){
+            ret=DoHttpRequest(Url,RequestType);
+            if(ret){
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+bool curlThread::QuickHttpRequest(const QString &Url, const QString &RequestType, QString &responce, int MaxRetry)
+{
+    curlThread qnam;
+    qnam.PureHttpRequest(Url,RequestType,MaxRetry);
+    responce=qnam.getResult();
+    if(responce.isEmpty())
+        responce=qnam.getError();
+    return !responce.isEmpty();
 }
