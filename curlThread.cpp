@@ -110,7 +110,7 @@ void curlThread::run()
             UploadRequestMulti(type);
         else if(Headers.count())
             UploadRequestWithHeader(type);
-        else if(Options.count())
+        else
             UploadRequest(type);
     }
     inDownloading=false;
